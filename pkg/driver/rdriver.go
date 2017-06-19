@@ -1,10 +1,10 @@
 package driver
 
 import (
-	"goredis-driver/pkg/config"
+	"go-redis-driver/pkg/config"
 	"net"
 	"errors"
-	"goredis-driver/pkg/log"
+	"go-redis-driver/pkg/log"
 	"time"
 )
 

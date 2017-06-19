@@ -1,17 +1,18 @@
 package main
 
 import (
-	"goredis-driver/pkg/api"
+	"go-redis-driver/pkg/api"
 	"time"
 	"bufio"
 	"os"
-	"goredis-driver/pkg/config"
+	"go-redis-driver/pkg/config"
+	"encoding/json"
 )
 
 func main() {
 	print(string([]byte("begin\r\n")))
 
-	dapi := whynotrun3()
+	dapi := whynotrun2()
 
 	reader := bufio.NewReader(os.Stdin)
 	println("press YNA key #1")
@@ -83,6 +84,36 @@ func whynotrun3() (*api.DriverApi){
 		println(err.Error())
 	} else {
 		println(b[0], b[1])
+	}
+
+	return dapi
+}
+
+type Cell struct {
+	Width int
+	Height int
+	Length int
+}
+
+func whynotrun4() (*api.DriverApi){
+	apipool := &api.DriverPool{}
+	dapi := apipool.GetClientByConfig(config4test())
+
+	if b,err := dapi.Set("cell", Cell{Width:1,Height:2,Length:3}); err != nil {
+		println(err.Error())
+	} else {
+		println(b)
+	}
+
+	if b, err := dapi.Get("cell"); err != nil {
+		println(err.Error())
+	} else {
+		var cell Cell
+		if err := json.Unmarshal([]byte(b), &cell); err != nil {
+			print("wrong value type of key")
+		} else {
+			print(cell.Width, cell.Height, cell.Length)
+		}
 	}
 
 	return dapi

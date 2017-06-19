@@ -2,7 +2,7 @@ package driver
 
 import (
 	"net"
-	"goredis-driver/pkg/log"
+	"go-redis-driver/pkg/log"
 	"strconv"
 	"errors"
 )

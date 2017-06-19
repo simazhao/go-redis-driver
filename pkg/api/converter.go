@@ -1,7 +1,7 @@
 package api
 
 import (
-	"goredis-driver/pkg/driver"
+	"go-redis-driver/pkg/driver"
 	"encoding/json"
 	"sync"
 	"time"

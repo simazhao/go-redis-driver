@@ -1,16 +1,22 @@
 package api
 
 import (
-	"goredis-driver/pkg/driver"
-	"goredis-driver/pkg/config"
-	"goredis-driver/pkg/log"
+	"go-redis-driver/pkg/driver"
+	"go-redis-driver/pkg/config"
+	"go-redis-driver/pkg/log"
 	"time"
 )
 
 type IDriverApi interface {
 	Set(key string, val interface{}) (bool, error)
 
-	Get(key string) (interface{}, error)
+	SetExpIn(key string, val interface{}, dur time.Duration) (bool, error)
+
+	Get(key string) (string, error)
+
+	MGet(keys ...string) ([]string, error)
+
+	MSet(keyvals map[string]interface{}) (bool, error)
 
 	Close() error
 }
@@ -23,7 +29,7 @@ func (dp *DriverPool) loadConfig() Config.RedisConfig {
 	return Config.RedisConfig{}
 }
 
-func (dp *DriverPool) GetClient() *DriverApi {
+func (dp *DriverPool) GetClient() IDriverApi {
 	api := &DriverApi{}
 	api.driver = driver.NewDriver(Config.DefaultDriverConfig(), dp.loadConfig())
 	return api
@@ -104,11 +110,9 @@ func (d *DriverApi) Get(key string) (string, error) {
 			return "", request.Err
 		}
 
-		if len(request.Clips) == 0 {
+		if len(request.Clips) == 0 || len(request.Clips[0].Value) == 0{
 			return "", nil
 		}
-
-		log.Factory.GetLogger().Info(string(request.Clips[0].Value))
 
 		return string(request.Clips[0].Value), nil
 	}
