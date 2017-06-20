@@ -6,7 +6,6 @@ import (
 	"errors"
 	"io"
 	"fmt"
-	"go-redis-driver/pkg/log"
 )
 
 
@@ -15,22 +14,18 @@ type RedisWriter struct {
 }
 
 func (e *RedisWriter) WriteRequest(r *Request) (err error) {
-	log.Factory.GetLogger().Info("writeTotalLength")
 	if err = e.writeTotalLength(len(r.Clips)); err != nil {
 		return
 	}
 
 	for _, clip := range r.Clips {
-		log.Factory.GetLogger().Info("writeRequestClip")
 		if err = e.writeRequestClip(clip); err != nil {
 			return
 		}
 	}
 
-	log.Factory.GetLogger().Info("Flush")
 	_, err = e.Writer.Flush()
 
-	log.Factory.GetLogger().Info("Flush over")
 	return
 }
 

@@ -47,69 +47,45 @@ type DriverApi struct {
 	driver *driver.RedisDriver
 }
 
+func (d *DriverApi) process(request *driver.Request) error {
+	d.driver.Put(request)
+	log.Factory.GetLogger().Info("put request to driver")
+	request.Wait.Wait()
+
+	log.Factory.GetLogger().Info("request process over")
+	if request.Err != nil {
+		return request.Err
+	}
+
+	return nil
+}
+
 func (d *DriverApi) Set(key string, val interface{}) (bool, error) {
 	if request, err := convertSetKeyValue(key, val); err != nil {
 		return false, err
+	} else if err := d.process(request); err != nil {
+		return false, err
 	} else {
-		d.driver.Put(request)
-		log.Factory.GetLogger().Info("put request to driver")
-		request.Wait.Wait()
-
-		log.Factory.GetLogger().Info("request process over")
-		if request.Err != nil {
-			println(request.Err.Error())
-			return false, request.Err
-		}
-
-		if len(request.Clips) > 0 {
-			if string(request.Clips[0].Value) != "OK" {
-				return false, nil
-			}
-		}
-
-		return true, nil
+		return len(request.Clips) > 0 && string(request.Clips[0].Value) == "OK", nil
 	}
 }
 
 func (d *DriverApi) SetExpIn(key string, val interface{}, dur time.Duration) (bool, error){
 	if request, err := convertSetKeyValueExpire(key, val, dur); err != nil {
 		return false, err
+	} else if err := d.process(request); err != nil {
+		return false, err
 	} else {
-		d.driver.Put(request)
-		log.Factory.GetLogger().Info("put request to driver")
-		request.Wait.Wait()
-
-		log.Factory.GetLogger().Info("request process over")
-		if request.Err != nil {
-			println(request.Err.Error())
-			return false, request.Err
-		}
-
-		if len(request.Clips) > 0 {
-			if string(request.Clips[0].Value) != "OK" {
-				return false, nil
-			}
-		}
-
-		return true, nil
+		return len(request.Clips) > 0 && string(request.Clips[0].Value) == "OK", nil
 	}
 }
-
 
 func (d *DriverApi) Get(key string) (string, error) {
 	if request, err := convertGetKeyValue(key); err != nil {
 		return "", err
+	} else if err := d.process(request); err != nil {
+		return "", err
 	} else {
-		d.driver.Put(request)
-		log.Factory.GetLogger().Info("put request to driver")
-		request.Wait.Wait()
-
-		log.Factory.GetLogger().Info("request process over")
-		if request.Err != nil {
-			println(request.Err.Error())
-			return "", request.Err
-		}
-
 		if len(request.Clips) == 0 || len(request.Clips[0].Value) == 0{
 			return "", nil
 		}
@@ -121,17 +97,9 @@ func (d *DriverApi) Get(key string) (string, error) {
 func (d *DriverApi) MGet(keys ...string) ([]string, error) {
 	if request, err := convertMGetKeyValue(keys); err != nil {
 		return nil, err
+	} else if err := d.process(request); err != nil {
+		return nil, err
 	} else {
-		d.driver.Put(request)
-		log.Factory.GetLogger().Info("put request to driver")
-		request.Wait.Wait()
-
-		log.Factory.GetLogger().Info("request process over")
-		if request.Err != nil {
-			println(request.Err.Error())
-			return nil, request.Err
-		}
-
 		if len(request.Clips) == 0 {
 			return nil, nil
 		}
@@ -149,17 +117,9 @@ func (d *DriverApi) MGet(keys ...string) ([]string, error) {
 func (d *DriverApi) MSet(keyvals map[string]interface{}) (bool, error) {
 	if request, err := convertMSetKeyValue(keyvals); err != nil {
 		return false, err
-	} else {
-		d.driver.Put(request)
-		log.Factory.GetLogger().Info("put request to driver")
-		request.Wait.Wait()
-
-		log.Factory.GetLogger().Info("request process over")
-		if request.Err != nil {
-			println(request.Err.Error())
-			return false, request.Err
-		}
-
+	} else if err := d.process(request); err != nil {
+		return false, err
+	}else {
 		if len(request.Clips) == 0 {
 			return false, nil
 		}

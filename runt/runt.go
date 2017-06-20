@@ -7,6 +7,7 @@ import (
 	"os"
 	"go-redis-driver/pkg/config"
 	"encoding/json"
+	"fmt"
 )
 
 func main() {
@@ -27,6 +28,7 @@ func main() {
 func whynotrun2() (*api.DriverApi){
 	apipool := &api.DriverPool{}
 	dapi := apipool.GetClientByConfig(config4test())
+	ts := api.NewTimeSpan3(0, 2, 30)
 
 	if b,err := dapi.Set("who", "the king of fighter"); err != nil {
 		println(err.Error())
@@ -34,7 +36,6 @@ func whynotrun2() (*api.DriverApi){
 		println(b)
 	}
 
-	ts := api.NewTimeSpan3(0, 2, 30)
 
 	if b,err := dapi.SetExpIn("best", "cao ji jin", ts.GetDuration()); err != nil {
 		println(err.Error())
@@ -59,6 +60,30 @@ func whynotrun2() (*api.DriverApi){
 	} else {
 		println(b[0], b[1])
 	}
+
+	n := 500
+	for i:=1;i<n;i++ {
+		key := fmt.Sprintf("forcons-%d", i)
+		val := makestringn("abcd-", i)
+		//dapi.Set(key, val)
+		if b, err := dapi.SetExpIn(key, val, ts.GetDuration()); !b || err != nil {
+			println("set fail", key, b)
+		}
+
+		//time.Sleep(api.NewTimeSpan1(0,0,0, 0,10).GetDuration())
+
+		if real, err := dapi.Get(key); err != nil {
+			println("get key error:", key, err.Error())
+			break
+		} else if fmt.Sprintf("\"%s\"", val) == real{
+			println("get key ok:", key)
+		} else {
+			println("get key incorrect:", key)
+			break
+		}
+	}
+
+	println("all over")
 
 	return dapi
 }
@@ -87,6 +112,15 @@ func whynotrun3() (*api.DriverApi){
 	}
 
 	return dapi
+}
+
+func makestringn(content string, n int) string {
+	ret := content
+	for i:=1;i<n;i++ {
+		ret += content
+	}
+
+	return ret
 }
 
 type Cell struct {

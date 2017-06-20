@@ -9,5 +9,5 @@ type DriverConfig struct {
 }
 
 func DefaultDriverConfig() DriverConfig {
-	return DriverConfig{BufferSize:1024, RequsetChanLength:1024}
+	return DriverConfig{BufferSize:2048, RequsetChanLength:1024}
 }
