@@ -1,11 +1,11 @@
 package main
 
 import (
-	"go-redis-driver/pkg/api"
+	"github.com/simazhao/go-redis-driver/pkg/api"
 	"time"
 	"bufio"
 	"os"
-	"go-redis-driver/pkg/config"
+	"github.com/simazhao/go-redis-driver/pkg/config"
 	"encoding/json"
 	"fmt"
 )

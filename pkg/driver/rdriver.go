@@ -1,10 +1,10 @@
 package driver
 
 import (
-	"go-redis-driver/pkg/config"
+	"github.com/simazhao/go-redis-driver/pkg/config"
 	"net"
 	"errors"
-	"go-redis-driver/pkg/log"
+	"github.com/simazhao/go-redis-driver/pkg/log"
 	"time"
 )
 
